@@ -15,5 +15,9 @@ HTMLDialogElement.prototype.close = function () {
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn(() => ({ matches: false, addEventListener() {}, removeEventListener() {} })),
+  value: vi.fn(() => ({
+    matches: false,
+    addEventListener() {},
+    removeEventListener() {},
+  })),
 })

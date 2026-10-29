@@ -2,3 +2,7 @@ node_modules/
 dist/
 .playwright-cli/
 output/
+docs/
+!docs/
+docs/*
+!docs/api/

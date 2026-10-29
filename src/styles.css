@@ -1,4 +1,26 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+.account-page {
+  width: min(440px, 100%);
+  margin: 40px auto;
+  padding: 24px;
+}
+.sidebar-link {
+  display: block;
+  min-height: 44px;
+  padding: 12px;
+  border-radius: 8px;
+  color: #bdbdbd;
+}
+.sidebar-link:hover,
+.sidebar-link.is-active {
+  background: #242424;
+  color: #fff;
+}
+.button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
 
 @theme {
   --color-canvas: #000000;
@@ -55,8 +77,11 @@ a {
   padding-top: env(safe-area-inset-top);
   transition: grid-template-columns var(--duration-sidebar) var(--ease-surface);
 }
-.app-shell[data-sidebar-open="false"] {
+.app-shell[data-sidebar-open='false'] {
   grid-template-columns: 0px minmax(0, 1fr);
+}
+.app-shell[data-authenticated='false'] {
+  grid-template-columns: minmax(0, 1fr);
 }
 .brand {
   font-size: 18px;
@@ -79,7 +104,7 @@ a {
     opacity 180ms ease-out,
     visibility var(--duration-sidebar) allow-discrete;
 }
-.sidebar--desktop[aria-hidden="true"] {
+.sidebar--desktop[aria-hidden='true'] {
   opacity: 0;
   transform: translateX(-100%);
   visibility: hidden;
@@ -224,7 +249,7 @@ input::placeholder {
 input:hover {
   border-color: #808080;
 }
-input[aria-invalid="true"] {
+input[aria-invalid='true'] {
   border-color: #ffa7a7;
 }
 .field-error {
@@ -263,7 +288,8 @@ input[aria-invalid="true"] {
   color: #f5f5f5;
   background: var(--color-sidebar);
 }
-.auth-dialog[open], .sidebar-dialog[open] {
+.auth-dialog[open],
+.sidebar-dialog[open] {
   transform: none;
 }
 /* A native dialog needs a starting style each time it enters the top layer. */
@@ -296,7 +322,8 @@ input[aria-invalid="true"] {
 }
 
 @media (max-width: 767px) {
-  .app-shell, .app-shell[data-sidebar-open="false"] {
+  .app-shell,
+  .app-shell[data-sidebar-open='false'] {
     grid-template-columns: minmax(0, 1fr);
   }
   .sidebar--desktop,

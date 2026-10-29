@@ -1,104 +1,100 @@
-import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import App from "./App.jsx";
+import { beforeAll, afterAll, afterEach, expect, it } from 'vitest'
+import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router'
+import { setupServer } from 'msw/node'
+import { http, HttpResponse, delay } from 'msw'
+import { handlers, resetMock } from './mocks/handlers.js'
+import { session, authHttp } from './api/http.js'
+import AuthProvider from './features/auth/AuthProvider.jsx'
+import AppRouter from './router/AppRouter.jsx'
+import { canAccess, safeDestination } from './router/access.js'
+const server = setupServer(...handlers)
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
+afterAll(() => server.close())
+afterEach(() => {
+  server.resetHandlers()
+  resetMock()
+  session.clear()
+})
+const renderPage = (path = '/login') =>
+  render(
+    <MemoryRouter initialEntries={[path]}>
+      <AuthProvider>
+        <AppRouter />
+      </AuthProvider>
+    </MemoryRouter>,
+  )
 
-describe("application shell", () => {
-  it("keeps focus in the form when switching modes on mobile", async () => {
-    window.matchMedia.mockImplementation((query) => ({
-      matches: query.includes("max-width"),
-      addEventListener() {},
-      removeEventListener() {},
-    }));
-    try {
-      const user = userEvent.setup();
-      render(<App />);
-      await user.click(screen.getByRole("button", { name: "Log in" }));
-      const dialog = screen.getByRole("dialog");
-      await user.click(within(dialog).getByRole("button", { name: "Sign up" }));
-      expect(
-        screen.getByRole("heading", { name: "Create your account" }),
-      ).toHaveFocus();
-    } finally {
-      window.matchMedia.mockImplementation(() => ({
-        matches: false,
-        addEventListener() {},
-        removeEventListener() {},
-      }));
-    }
-  });
-  it("keeps account actions in the header and can collapse the sidebar", async () => {
-    const user = userEvent.setup();
-    render(<App />);
-    const sidebar = screen.getByRole("complementary");
-    expect(
-      within(sidebar).queryByRole("button", { name: "Log in" }),
-    ).not.toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Close sidebar" }));
-    expect(screen.queryByRole("complementary")).not.toBeInTheDocument();
-    expect(sidebar).toHaveAttribute("inert");
-    // jsdom does not apply responsive CSS, so select the desktop control explicitly.
-    const openButton = screen
-      .getAllByRole("button", { name: "Open sidebar" })
-      .find(
-        (button) => button.getAttribute("aria-controls") === "desktop-sidebar",
-      );
-    await user.click(openButton);
-    expect(sidebar).toBeVisible();
-    expect(sidebar).not.toHaveAttribute("inert");
-  });
-
-  it("opens the requested form and clears fields when switching modes", async () => {
-    const user = userEvent.setup();
-    render(<App />);
-    await user.click(screen.getByRole("button", { name: "Log in" }));
-    const dialog = screen.getByRole("dialog", { name: "Welcome back" });
-    await user.type(
-      within(dialog).getByLabelText("Email"),
-      "person@example.com",
-    );
-    await user.type(within(dialog).getByLabelText("Password"), "a-password");
-    await user.click(within(dialog).getByRole("button", { name: "Sign up" }));
-    expect(
-      screen.getByRole("heading", { name: "Create your account" }),
-    ).toBeVisible();
-    expect(within(dialog).getByLabelText("Email")).toHaveValue("");
-    expect(within(dialog).getByLabelText("Password")).toHaveValue("");
-    await user.click(
-      within(dialog).getByRole("button", { name: "Close form" }),
-    );
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
-
-  for (const action of ["Log in", "Sign up"]) {
-    it(`validates input and only shows a demo result for ${action}`, async () => {
-      const user = userEvent.setup();
-      render(<App />);
-      await user.click(screen.getByRole("button", { name: action }));
-      const dialog = screen.getByRole("dialog");
-      const submit = within(dialog).getByRole("button", {
-        name: action,
-        exact: true,
-      });
-      await user.click(submit);
-      expect(
-        within(dialog).getByText("Enter your email address."),
-      ).toBeVisible();
-      expect(within(dialog).getByLabelText("Email")).toHaveFocus();
-      await user.type(within(dialog).getByLabelText("Email"), "not-an-email");
-      await user.type(within(dialog).getByLabelText("Password"), "a-password");
-      await user.click(submit);
-      expect(
-        within(dialog).getByText("Enter a valid email address."),
-      ).toBeVisible();
-      await user.clear(within(dialog).getByLabelText("Email"));
-      await user.type(
-        within(dialog).getByLabelText("Email"),
-        "person@example.com",
-      );
-      await user.click(submit);
-      expect(within(dialog).getByRole("status")).toHaveTextContent("Demo only");
-      expect(within(dialog).getByLabelText("Password")).toHaveValue("");
-    });
-  }
-});
+it('ignores a slow login after leaving the login page', async () => {
+  server.use(
+    http.post('http://localhost/api/v1/auth/login', async () => {
+      await delay(150)
+      return HttpResponse.json({
+        accessToken: 'late',
+        user: { id: 'employee', roles: ['EMPLOYEE'] },
+      })
+    }),
+  )
+  const user = userEvent.setup()
+  renderPage()
+  await user.type(
+    screen.getByRole('textbox', { name: 'Email' }),
+    'employee@demo.test',
+  )
+  const loginForm = within(screen.getByRole('region', { name: 'Log in' }))
+  await user.type(loginForm.getByLabelText('Password'), 'Demo12345!')
+  await user.click(loginForm.getByRole('button', { name: 'Log in' }))
+  await user.click(screen.getByRole('link', { name: 'Forgot password?' }))
+  await new Promise((resolve) => setTimeout(resolve, 200))
+  expect(session.token).toBeNull()
+})
+it('logs Employee in with scoped menu and logs out', async () => {
+  const user = userEvent.setup()
+  renderPage('/admin/users')
+  await screen.findByRole('heading', { name: 'Log in' })
+  expect(screen.queryByRole('complementary', { name: 'Sidebar' })).toBeNull()
+  expect(screen.queryByRole('button', { name: /sidebar/i })).toBeNull()
+  await user.type(
+    screen.getByRole('textbox', { name: 'Email' }),
+    'employee@demo.test',
+  )
+  const loginForm = within(screen.getByRole('region', { name: 'Log in' }))
+  await user.type(loginForm.getByLabelText('Password'), 'Demo12345!')
+  await user.click(loginForm.getByRole('button', { name: 'Log in' }))
+  await screen.findByRole('heading', { name: 'Overview' })
+  expect(screen.getByRole('complementary', { name: 'Sidebar' })).toBeVisible()
+  expect(screen.getByRole('button', { name: 'Close sidebar' })).toBeVisible()
+  const nav = screen.getByRole('navigation', { name: 'Navigation' })
+  expect(
+    within(nav).getByRole('link', { name: 'Incoming correspondence' }),
+  ).toBeVisible()
+  expect(within(nav).queryByRole('link', { name: 'Users' })).toBeNull()
+  await user.click(screen.getByRole('button', { name: 'Log out' }))
+  await screen.findByRole('heading', { name: 'Log in' })
+  expect(screen.queryByRole('complementary', { name: 'Sidebar' })).toBeNull()
+  expect(screen.queryByRole('button', { name: /sidebar/i })).toBeNull()
+})
+it('shows 404 for unknown routes', async () => {
+  renderPage('/not-found')
+  expect(await screen.findByRole('heading', { name: /404/ })).toBeVisible()
+})
+it('denies unknown roles and external return URLs', () => {
+  expect(canAccess({ roles: ['UNKNOWN'] }, ['ADMIN'])).toBe(false)
+  expect(safeDestination('//evil.test', { roles: ['ADMIN'] })).toBe(
+    '/dashboard',
+  )
+  expect(safeDestination('/approvals', { roles: ['ADMIN'] })).toBe('/dashboard')
+  expect(safeDestination('/records?q=test', { roles: ['EMPLOYEE'] })).toBe(
+    '/records?q=test',
+  )
+})
+it.each([
+  ['admin@demo.test', '/approvals', /403/],
+  ['employee@demo.test', '/admin/users', /403/],
+  ['manager@demo.test', '/approvals', 'Pending approvals'],
+])('guards %s visiting %s', async (email, path, title) => {
+  await authHttp.post('/auth/login', { email, password: 'Demo12345!' })
+  renderPage(path)
+  expect(await screen.findByRole('heading', { name: title })).toBeVisible()
+})

@@ -1,8 +1,8 @@
-import Button from './Button.jsx'
-import { CloseIcon } from './Icons.jsx'
+import Button from '../../shared/components/Button.jsx'
+import { CloseIcon } from '../../shared/components/Icons.jsx'
 import { NavLink } from 'react-router'
-import { useAuth } from '../features/auth/useAuth.js'
-import { routes, canAccess } from '../router/access.js'
+import { useAuth } from '../../features/auth/context/useAuth.js'
+import { routes, canAccess } from '../../app/router/access.js'
 
 export default function Sidebar({
   mobile = false,

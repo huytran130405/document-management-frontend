@@ -1,15 +1,10 @@
-import {
-  Navigate,
-  Outlet,
-  Route,
-  Routes,
-  useLocation,
-  Link,
-} from 'react-router'
-import { useAuth } from '../features/auth/useAuth.js'
-import AccountPage from '../features/auth/AccountPage.jsx'
-import AppLayout from '../components/AppLayout.jsx'
-import Workspace from '../pages/Workspace.jsx'
+import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router'
+import { useAuth } from '../../features/auth/context/useAuth.js'
+import AccountPage from '../../features/auth/pages/AccountPage.jsx'
+import AppLayout from '../../layouts/AppLayout/AppLayout.jsx'
+import Workspace from '../../pages/Workspace.jsx'
+import ForbiddenPage from '../../pages/ForbiddenPage.jsx'
+import NotFoundPage from '../../pages/NotFoundPage.jsx'
 import { routes, canAccess } from './access.js'
 
 function Guard({ roles }) {
@@ -41,18 +36,6 @@ function Guard({ roles }) {
   if (!canAccess(auth.user, roles)) return <Navigate replace to="/403" />
   return <Outlet />
 }
-function ErrorPage({ code }) {
-  return (
-    <section className="p-10">
-      <h1 className="text-3xl">
-        {code} · {code === 403 ? 'Access denied' : 'Page not found'}
-      </h1>
-      <Link className="text-link mt-6" to="/dashboard">
-        Back to overview
-      </Link>
-    </section>
-  )
-}
 export default function AppRouter() {
   return (
     <Routes>
@@ -80,8 +63,8 @@ export default function AppRouter() {
             />
           </Route>
         ))}
-        <Route path="403" element={<ErrorPage code={403} />} />
-        <Route path="*" element={<ErrorPage code={404} />} />
+        <Route path="403" element={<ForbiddenPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   )

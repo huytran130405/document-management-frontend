@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { session, refreshSession } from '../../api/http.js'
-import { authApi } from './authApi.js'
+import { session, refreshSession } from '../../../shared/api/http.js'
+import { authApi } from '../api/authApi.js'
 import { AuthContext } from './useAuth.js'
 
 export default function AuthProvider({ children }) {

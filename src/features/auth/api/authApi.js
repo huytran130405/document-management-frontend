@@ -1,4 +1,4 @@
-import { api, authHttp } from '../../api/http.js'
+import { api, authHttp } from '../../../shared/api/http.js'
 
 export const authApi = {
   login: (values, signal) =>

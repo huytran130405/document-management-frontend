@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
-import Button from './Button.jsx'
+import Button from '../../../shared/components/Button.jsx'
 
-export default function AuthForm({ mode, onSwitch }) {
+export default function SignupDemoForm({ mode, onSwitch }) {
   const [errors, setErrors] = useState({})
   const [submitted, setSubmitted] = useState(false)
   const emailRef = useRef(null)

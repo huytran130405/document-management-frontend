@@ -6,3 +6,4 @@ docs/
 !docs/
 docs/*
 !docs/api/
+.env.local/

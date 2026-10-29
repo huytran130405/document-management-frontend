@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import App from './App.jsx'
-import './styles.css'
+import App from './app/App.jsx'
+import './shared/styles/styles.css'
 import { env } from './config/env.js'
 
 if (import.meta.env.DEV && env.mockEnabled) {

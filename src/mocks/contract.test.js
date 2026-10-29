@@ -3,7 +3,7 @@ import Ajv from 'ajv'
 import { beforeAll, afterAll, afterEach, expect, it } from 'vitest'
 import { setupServer } from 'msw/node'
 import { handlers, resetMock } from './handlers.js'
-import { api, authHttp, session } from '../api/http.js'
+import { api, authHttp, session } from '../shared/api/http.js'
 const spec = JSON.parse(
   readFileSync('docs/api/openapi-auth.proposal.yaml', 'utf8'),
 )

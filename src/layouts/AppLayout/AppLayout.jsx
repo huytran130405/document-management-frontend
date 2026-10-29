@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import Header from './Header.jsx'
 import Sidebar from './Sidebar.jsx'
-import AuthModal from './AuthModal.jsx'
+import SignupDemoModal from '../../features/auth/components/SignupDemoModal.jsx'
 import { Outlet, useNavigate } from 'react-router'
-import { useAuth } from '../features/auth/useAuth.js'
+import { useAuth } from '../../features/auth/context/useAuth.js'
 
 export default function AppLayout() {
   const navigate = useNavigate()
@@ -99,7 +99,7 @@ export default function AppLayout() {
           <Sidebar mobile onClose={closeMobileSidebar} />
         </dialog>
       )}
-      <AuthModal
+      <SignupDemoModal
         open={authOpen}
         mode={authMode}
         onClose={closeAuth}

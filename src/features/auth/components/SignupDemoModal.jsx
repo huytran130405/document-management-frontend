@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react'
-import AuthForm from './AuthForm.jsx'
-import Button from './Button.jsx'
-import { CloseIcon } from './Icons.jsx'
+import SignupDemoForm from './SignupDemoForm.jsx'
+import Button from '../../../shared/components/Button.jsx'
+import { CloseIcon } from '../../../shared/components/Icons.jsx'
 
-export default function AuthModal({ open, mode, onClose, onSwitch }) {
+export default function SignupDemoModal({ open, mode, onClose, onSwitch }) {
   const dialogRef = useRef(null)
 
   useEffect(() => {
@@ -63,7 +63,11 @@ export default function AuthModal({ open, mode, onClose, onSwitch }) {
               : 'Log in to pick up where you left off.'}
           </p>
         </div>
-        <AuthForm key={`${mode}-${open}`} mode={mode} onSwitch={onSwitch} />
+        <SignupDemoForm
+          key={`${mode}-${open}`}
+          mode={mode}
+          onSwitch={onSwitch}
+        />
         <p className="mt-7 text-center text-xs leading-5 text-muted">
           Interface preview · No account connection yet
         </p>

@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useLocation } from 'react-router'
-import Button from '../../components/Button.jsx'
-import { authApi } from './authApi.js'
-import { useAuth } from './useAuth.js'
-import { safeDestination } from '../../router/access.js'
+import Button from '../../../shared/components/Button.jsx'
+import { authApi } from '../api/authApi.js'
+import { useAuth } from '../context/useAuth.js'
+import { safeDestination } from '../../../app/router/access.js'
 
 export default function AccountPage({ mode }) {
   const auth = useAuth()

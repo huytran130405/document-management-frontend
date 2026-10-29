@@ -1,7 +1,7 @@
 import { beforeAll, afterAll, afterEach, expect, it } from 'vitest'
 import { setupServer } from 'msw/node'
 import { handlers, resetMock } from './handlers.js'
-import { api, authHttp, session } from '../api/http.js'
+import { api, authHttp, session } from '../shared/api/http.js'
 const server = setupServer(...handlers)
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
 afterAll(() => server.close())

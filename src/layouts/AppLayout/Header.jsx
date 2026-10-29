@@ -1,5 +1,5 @@
-import Button from './Button.jsx'
-import { PanelIcon } from './Icons.jsx'
+import Button from '../../shared/components/Button.jsx'
+import { PanelIcon } from '../../shared/components/Icons.jsx'
 
 export default function Header({
   sidebarOpen,

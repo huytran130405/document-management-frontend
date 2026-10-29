@@ -4,9 +4,9 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { setupServer } from 'msw/node'
 import { http, HttpResponse, delay } from 'msw'
-import { handlers, resetMock } from './mocks/handlers.js'
-import { session, authHttp } from './api/http.js'
-import AuthProvider from './features/auth/AuthProvider.jsx'
+import { handlers, resetMock } from '../mocks/handlers.js'
+import { session, authHttp } from '../shared/api/http.js'
+import AuthProvider from '../features/auth/context/AuthProvider.jsx'
 import AppRouter from './router/AppRouter.jsx'
 import { canAccess, safeDestination } from './router/access.js'
 const server = setupServer(...handlers)
@@ -25,6 +25,18 @@ const renderPage = (path = '/login') =>
       </AuthProvider>
     </MemoryRouter>,
   )
+
+it('keeps the signup demo separate and links back to mock login', async () => {
+  const user = userEvent.setup()
+  renderPage('/')
+  await user.click(screen.getByRole('button', { name: 'Sign up' }))
+  const dialog = await screen.findByRole('dialog', {
+    name: 'Create your account',
+  })
+  expect(within(dialog).getByText(/No account connection yet/)).toBeVisible()
+  await user.click(within(dialog).getByRole('button', { name: 'Log in' }))
+  expect(await screen.findByRole('heading', { name: 'Log in' })).toBeVisible()
+})
 
 it('ignores a slow login after leaving the login page', async () => {
   server.use(

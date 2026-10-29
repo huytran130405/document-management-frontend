@@ -1,5 +1,18 @@
 # Base UI
 
+## Source structure
+
+- `src/app/`: app setup, routing and route access rules.
+- `src/layouts/AppLayout/`: shared layout, header and sidebar.
+- `src/features/auth/`: mock login pages, auth API and context, plus the separate
+  `SignupDemoModal` and `SignupDemoForm` components.
+- `src/pages/`: shared workspace, 403 and 404 pages.
+- `src/shared/`: reusable components, HTTP client and styles.
+- `src/mocks/`, `src/config/`, `src/test/`: mock API, environment and test setup.
+
+Other feature directories and contexts can be added when the corresponding
+features are implemented. State management uses React Context.
+
 ## DMS frontend foundation
 
 React + JavaScript, Vite, Tailwind, React Router, Axios, Context and MSW.
@@ -51,7 +64,7 @@ session. No credentials or access token are written into browser storage.
 In browser DevTools on the running Vite page:
 
 ```js
-const { api, authHttp } = await import('/src/api/http.js')
+const { api, authHttp } = await import('/src/shared/api/http.js')
 await authHttp.post('/demo/session', { scenario: 'access-expired' })
 await api.get('/demo/documents/a') // refresh then retry (employee/manager office-a)
 await api.get('/demo/documents/b') // 403 for office-a accounts
@@ -67,7 +80,7 @@ reset to Demo12345!. This mock is not persistent user/password storage.
 
 Copy `.env.example` to `.env.local`, set `VITE_ENABLE_MOCKS=false` and
 `VITE_API_BASE_URL` to the real API, then restart Vite. Map schema differences in
-`src/features/auth/authApi.js`; UI and route guards keep using the same interface.
+`src/features/auth/api/authApi.js`; UI and route guards keep using the same interface.
 Production never starts MSW. Configure hosting to serve index.html for frontend
 routes, without rewriting API or asset URLs. Verify real cookie HttpOnly/Secure/
 SameSite, CORS and CSRF behavior with the backend separately. No real backend

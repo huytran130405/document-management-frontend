@@ -1,5 +1,16 @@
 # Base UI
 
+## Project planning documents
+
+- [Business analysis proposal](docs/superpowers/specs/2026-10-29-document-records-business-analysis.md): proposed document workflows and roles.
+- [Frontend auth scope](docs/superpowers/specs/2026-10-29-auth-role-scope.md): the original checklist and mock-first decisions.
+- [Frontend auth implementation plan](docs/superpowers/plans/2026-10-29-frontend-auth-roles.md): implementation plan and completion notes.
+- [Mock acceptance notes](docs/auth-acceptance.md): verification performed on 29 October 2026 and known limitations.
+- [Auth API proposal](docs/api/auth-contract.md): FE-owned contract and mock limitations.
+
+The planning documents are historical proposals, not approved backend contracts.
+For the current source structure, use the section below and the code itself.
+
 ## Source structure
 
 - `src/app/`: app setup, routing and route access rules.

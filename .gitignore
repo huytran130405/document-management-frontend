@@ -6,4 +6,9 @@ docs/
 !docs/
 docs/*
 !docs/api/
+!docs/auth-acceptance.md
+!docs/superpowers/
+docs/superpowers/*
+!docs/superpowers/plans/
+!docs/superpowers/specs/
 .env.local/
